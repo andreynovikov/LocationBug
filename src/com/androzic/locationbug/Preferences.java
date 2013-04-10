@@ -114,6 +114,7 @@ public class Preferences extends PreferenceActivity implements OnSharedPreferenc
 		boolean enabled = sharedPreferences.getBoolean(getString(R.string.pref_enabled), false);
 		findPreference(getString(R.string.pref_sharing_session)).setEnabled(!enabled);
 		findPreference(getString(R.string.pref_sharing_user)).setEnabled(!enabled);
+		findPreference(getString(R.string.pref_sharing_updateinterval)).setEnabled(!enabled);
 	}
 
 	@SuppressLint("NewApi")

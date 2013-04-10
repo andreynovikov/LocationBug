@@ -43,13 +43,14 @@ public class SharingService extends Service implements OnSharedPreferenceChangeL
 	private Notification notification;
 	private PendingIntent contentIntent;
 
-	ThreadPoolExecutor executorThread = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(1));
+	private ThreadPoolExecutor executorThread = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(1));
 	private Timer timer;
 
 	private LocationManager locationManager = null;
-	Location currentLocation = new Location("unknown");
-	String session;
-	String user;
+	private Location currentLocation = new Location("unknown");
+	private float nmeaGeoidHeight = Float.NaN;
+	private String session;
+	private String user;
 	private int updateInterval = 10000; // 10 seconds (default)
 
 	@Override
@@ -112,13 +113,20 @@ public class SharingService extends Service implements OnSharedPreferenceChangeL
 					String query = null;
 					synchronized (currentLocation)
 					{
-						query = "silent=1;session=" + URLEncoder.encode(session) + ";user=" + URLEncoder.encode(user) + ";lat=" + currentLocation.getLatitude() + ";lon=" + currentLocation.getLongitude()
-								+ ";track=" + currentLocation.getBearing() + ";speed=" + currentLocation.getSpeed() + ";ftime=" + currentLocation.getTime();
+						query = "silent=1;" +
+								"session=" + URLEncoder.encode(session) +
+								";user=" + URLEncoder.encode(user) +
+								";lat=" + currentLocation.getLatitude() +
+								";lon=" + currentLocation.getLongitude() +
+								";track=" + currentLocation.getBearing() +
+								";speed=" + currentLocation.getSpeed() +
+								";accuracy=" + currentLocation.getAccuracy() +
+								";ftime=" + currentLocation.getTime();
 					}
 					URL = new URI("http", null, "androzic.com", 80, "/cgi-bin/loc.cgi", query, null);
 
 					HttpClient httpclient = new DefaultHttpClient();
-					HttpResponse response = httpclient.execute(new HttpGet(URL));
+					httpclient.execute(new HttpGet(URL));
 				}
 				catch (URISyntaxException e)
 				{
@@ -152,7 +160,7 @@ public class SharingService extends Service implements OnSharedPreferenceChangeL
 		{
 			try
 			{
-				locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+				locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, updateInterval, 0, this);
 				Log.d(TAG, "Network provider set");
 			}
 			catch (IllegalArgumentException e)
@@ -161,7 +169,8 @@ public class SharingService extends Service implements OnSharedPreferenceChangeL
 			}
 			try
 			{
-				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+				long minTime = updateInterval > 120000 ? updateInterval : 0;
+				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTime, 0, this);
 				locationManager.addNmeaListener(this);
 				Log.d(TAG, "Gps provider set");
 			}
@@ -258,12 +267,49 @@ public class SharingService extends Service implements OnSharedPreferenceChangeL
 	@Override
 	public void onNmeaReceived(long timestamp, String nmea)
 	{
-		// TODO Auto-generated method stub
+		if (nmea.indexOf('\n') == 0)
+			return;
+		if (nmea.indexOf('\n') > 0)
+		{
+			nmea = nmea.substring(0, nmea.indexOf('\n') - 1);
+		}
+		int len = nmea.length();
+		if (len < 9)
+		{
+			return;
+		}
+		if (nmea.charAt(len - 3) == '*')
+		{
+			nmea = nmea.substring(0, len - 3);
+		}
+		String[] tokens = nmea.split(",");
+		String sentenceId = tokens[0].length() > 5 ? tokens[0].substring(3, 6) : "";
+
+		try
+		{
+			if (sentenceId.equals("GGA") && tokens.length > 11)
+			{
+				String heightOfGeoid = tokens[11];
+				if (!"".equals(heightOfGeoid))
+					nmeaGeoidHeight = Float.parseFloat(heightOfGeoid);
+			}
+		}
+		catch (NumberFormatException e)
+		{
+			Log.e(TAG, "NFE", e);
+		}
+		catch (ArrayIndexOutOfBoundsException e)
+		{
+			Log.e(TAG, "AIOOBE", e);
+		}
 	}
 
 	@Override
 	public void onLocationChanged(Location location)
 	{
+		Log.e(TAG, "Location arrived from " + location.getProvider());
+		if (!Float.isNaN(nmeaGeoidHeight))
+			location.setAltitude(location.getAltitude() + nmeaGeoidHeight);
 		synchronized (currentLocation)
 		{
 			currentLocation.set(location);
