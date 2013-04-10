@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Location Bug</string>
+    <string name="notif_sharing">Sharing location in real-time</string>
+    <string name="notif_error">Unable to share location</string>
+    <string name="pref_enabled_v7_title">Enable sharing</string>
+    <string name="pref_enabled_v14_title">Location sharing</string>
+    <string name="pref_sharing_session_title">Session title</string>
+    <string name="pref_sharing_user_title">User identifier</string>
+    <string name="pref_sharing_updateinterval_title">Update interval</string>
+    <string name="pref_startatboot_title">Start at boot</string>
+
+</resources>

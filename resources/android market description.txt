@@ -1,0 +1,5 @@
+Companion application for <b>Androzic Location Sharing Plugin</b> which enables sending locations in real time. It is small and works in background. It does not have any user interface to see other users in a sharing session nor it consumes any traffic to get that data. Thus it is useful if you only want to broadcast your current location to other users in real time.
+
+Locations are stored on a dedicated server so your device must provide data connectivity (e.g. GPRS or Wi-Fi).
+
+All locations are stored on server for 24 hours (cleaned hourly).

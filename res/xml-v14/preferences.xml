@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:androzic="http://schemas.android.com/apk/res/com.androzic.locationbug" >
+
+    <SwitchPreference
+        android:key="@string/pref_enabled"
+        android:title="@string/pref_enabled_v14_title" />
+
+    <EditTextPreference
+        android:key="@string/pref_sharing_session"
+        android:maxLength="60"
+        android:singleLine="true"
+        android:title="@string/pref_sharing_session_title" />
+    <EditTextPreference
+        android:key="@string/pref_sharing_user"
+        android:maxLength="60"
+        android:singleLine="true"
+        android:title="@string/pref_sharing_user_title" />
+
+    <com.androzic.ui.SeekbarPreference
+        android:key="@string/pref_sharing_updateinterval"
+        android:text=" s"
+        android:title="@string/pref_sharing_updateinterval_title"
+        androzic:defaultValue="@integer/def_updateinterval"
+        androzic:format="0"
+        androzic:max="300"
+        androzic:min="3" />
+
+    <CheckBoxPreference
+        android:defaultValue="@bool/def_startatboot"
+        android:key="@string/pref_startatboot"
+        android:title="@string/pref_startatboot_title" />
+
+</PreferenceScreen>
