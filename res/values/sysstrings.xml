@@ -3,6 +3,7 @@
 
     <string name="pref_enabled" translatable="false">enabled</string>
     <string name="pref_startatboot" translatable="false">startatboot</string>
+    <string name="pref_loc_usenetwork" translatable="false">loc_usenetwork</string>
     <string name="pref_sharing_session" translatable="false">sharing_session</string>
     <string name="pref_sharing_user" translatable="false">sharing_user</string>
     <string name="pref_sharing_updateinterval" translatable="false">sharing_updateinterval</string>

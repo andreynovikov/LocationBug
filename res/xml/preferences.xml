@@ -27,6 +27,10 @@
         androzic:min="3" />
 
     <CheckBoxPreference
+        android:defaultValue="@bool/def_loc_usenetwork"
+        android:key="@string/pref_loc_usenetwork"
+        android:title="@string/pref_loc_usenetwork_title" />
+    <CheckBoxPreference
         android:defaultValue="@bool/def_startatboot"
         android:key="@string/pref_startatboot"
         android:title="@string/pref_startatboot_title" />

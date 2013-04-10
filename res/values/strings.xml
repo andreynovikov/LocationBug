@@ -9,6 +9,7 @@
     <string name="pref_sharing_session_title">Session title</string>
     <string name="pref_sharing_user_title">User identifier</string>
     <string name="pref_sharing_updateinterval_title">Update interval</string>
+    <string name="pref_loc_usenetwork_title">Use networks</string>
     <string name="pref_startatboot_title">Start at boot</string>
 
 </resources>

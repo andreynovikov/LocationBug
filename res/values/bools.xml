@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <bool name="def_loc_usenetwork">true</bool>
     <bool name="def_startatboot">false</bool>
     
 </resources>

@@ -10,7 +10,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -52,6 +51,7 @@ public class SharingService extends Service implements OnSharedPreferenceChangeL
 	private String session;
 	private String user;
 	private int updateInterval = 10000; // 10 seconds (default)
+	private boolean useNetwork = true;
 
 	@Override
 	public void onCreate()
@@ -67,6 +67,7 @@ public class SharingService extends Service implements OnSharedPreferenceChangeL
 		onSharedPreferenceChanged(sharedPreferences, getString(R.string.pref_sharing_session));
 		onSharedPreferenceChanged(sharedPreferences, getString(R.string.pref_sharing_user));
 		onSharedPreferenceChanged(sharedPreferences, getString(R.string.pref_sharing_updateinterval));
+		onSharedPreferenceChanged(sharedPreferences, getString(R.string.pref_loc_usenetwork));
 		sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
 		// Connect to location service
@@ -158,14 +159,17 @@ public class SharingService extends Service implements OnSharedPreferenceChangeL
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		if (locationManager != null)
 		{
-			try
+			if (useNetwork)
 			{
-				locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, updateInterval, 0, this);
-				Log.d(TAG, "Network provider set");
-			}
-			catch (IllegalArgumentException e)
-			{
-				Log.d(TAG, "Cannot set network provider, likely no mobile service on device");
+				try
+				{
+					locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, updateInterval, 0, this);
+					Log.d(TAG, "Network provider set");
+				}
+				catch (IllegalArgumentException e)
+				{
+					Log.d(TAG, "Cannot set network provider, likely no mobile service on device");
+				}
 			}
 			try
 			{
@@ -234,6 +238,12 @@ public class SharingService extends Service implements OnSharedPreferenceChangeL
 				stopTimer();
 				startTimer();
 			}
+		}
+		else if (getString(R.string.pref_loc_usenetwork).equals(key))
+		{
+			useNetwork = sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.def_loc_usenetwork));
+			disconnect();
+			connect();
 		}
 
 		if ((session != null && session.trim().equals("")) || (user != null && user.trim().equals("")))
